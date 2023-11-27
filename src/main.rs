@@ -1,21 +1,22 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Changed")
-}
-
-#[get("/fuck")]
-async fn fuck() -> impl Responder {
-    HttpResponse::Ok().body("Fuck")
-}
+use actix_web::{App, HttpServer, web};
+use actix_cors::Cors;
+use uno_api::routes::player;
+use uno_api::models::state;
+use dotenv::dotenv;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    dotenv().ok();
+
+    let app_data = state::State {name: "App".to_string()};
+
+    HttpServer::new(move || {
+        let cors = Cors::permissive();
+
         App::new()
-            .service(hello)
-            .service(fuck)
+            .app_data(app_data.clone())
+            .wrap(cors)
+            .service(web::scope("/player").configure(player::player_config))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
