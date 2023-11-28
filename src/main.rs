@@ -1,6 +1,6 @@
 use actix_web::{App, HttpServer, web};
 use actix_cors::Cors;
-use uno_api::routes::player;
+use uno_api::routes::{player, game};
 use uno_api::models::state;
 use dotenv::dotenv;
 
@@ -17,6 +17,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_data.clone())
             .wrap(cors)
             .service(web::scope("/player").configure(player::player_config))
+            .service(web::scope("/game").configure(game::game_config))
     })
     .bind(("0.0.0.0", 8080))?
     .run()

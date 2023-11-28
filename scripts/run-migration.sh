@@ -1,1 +1,0 @@
-echo DATABASE_URL=mysql://uno_user:ippenutt1@127.0.0.1:33006/uno > diesel migration run

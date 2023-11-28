@@ -4,8 +4,7 @@ diesel::table! {
     games (id) {
         id -> Integer,
         winner -> Integer,
-        #[max_length = 45]
-        timestamp -> Nullable<Varchar>,
+        timestamp -> Nullable<Datetime>,
     }
 }
 
