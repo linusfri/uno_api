@@ -1,3 +1,4 @@
+use actix_web::error::BlockingError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 use diesel::result::Error as DieselError;
@@ -49,5 +50,13 @@ impl ResponseError for ApiError {
 
         HttpResponse::build(status_code)
             .json(json!({ "message": message }))
+    }
+}
+
+impl From<BlockingError> for ApiError {
+    fn from(error: BlockingError) -> ApiError {
+        match error {
+            err => ApiError::new(500, format!("{}", err)) 
+        }
     }
 }

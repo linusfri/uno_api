@@ -11,8 +11,8 @@ pub async fn get_game(path: web::Path<i32>) -> Result<HttpResponse, ApiError> {
 pub async fn create_game(game: web::Json<NewGame>) -> Result<HttpResponse, ApiError> {
     let game = game.into_inner();
 
-    Game::create_game(game).await?;
-    Ok(HttpResponse::Ok().json("game created"))
+    let res = Game::create_game(game).await?;
+    Ok(HttpResponse::Ok().json(res))
 }
 
 pub async fn get_all_games() -> Result<HttpResponse, ApiError> {
