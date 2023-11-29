@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      dockerfile: ./app-build/Dockerfile
+      dockerfile: ./app-build/Dockerfile-app
       args:
         USER_ID: 1000
         GROUP_ID: 1000
@@ -21,6 +21,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - 33006:3306
+
   adminer:
       image: adminer
       restart: always
