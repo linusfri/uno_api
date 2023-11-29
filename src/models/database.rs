@@ -1,7 +1,8 @@
 use diesel::{prelude::*, r2d2};
 use lazy_static::lazy_static;
-use crate::models::api_error::ApiError;
 use std::env;
+
+use crate::models::api_error::ApiError;
 
 type Pool = r2d2::Pool<r2d2::ConnectionManager<MysqlConnection>>;
 type Dbconnection = r2d2::PooledConnection<r2d2::ConnectionManager<MysqlConnection>>;
