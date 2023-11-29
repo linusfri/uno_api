@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      dockerfile: ./app-build/Dockerfile
+      args:
+        USER_ID: 1000
+        GROUP_ID: 1000
+    environment:
+      - CARGO_TARGET_DIR=/target
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: uno
+      MYSQL_USER: uno_user
+      MYSQL_PASSWORD: mysql
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 33006:3306
+  adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 9000:8080
+
+volumes:
+  db_data:
