@@ -19,6 +19,8 @@ services:
       MYSQL_USER: uno_user
       MYSQL_PASSWORD: mysql
       MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
     ports:
       - 33006:3306
 

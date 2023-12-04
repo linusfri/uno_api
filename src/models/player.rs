@@ -1,11 +1,12 @@
 use std::fmt::Display;
 use diesel::prelude::*;
+use actix_web::web;
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 
 use crate::models::api_error::ApiError;
 use crate::models::database;
-use crate::schema::players;
+use crate::schema::players::{self};
 
 
 #[derive(Deserialize, Serialize, Debug, Queryable, Selectable)]
@@ -28,13 +29,42 @@ impl Player {
         Ok(player)
     }
     
-    pub async fn create_player(new_player: NewPlayer) -> Result<(), ApiError> {
+    pub async fn create_player(new_player: PartialPlayer) -> Result<(), ApiError> {
         let conn = &mut database::connection()?;
 
         diesel::insert_into(players::table)
             .values(new_player).execute(conn)?;
         
         Ok(())
+    }
+
+    pub async fn delete_player(id: i32) -> Result<usize, ApiError> {
+        let rows_affected = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+    
+            let rows_affected = diesel::delete(
+                players::table
+                    .filter(players::id.eq(id))
+            ).execute(conn)?;
+
+            Ok(rows_affected)
+        }).await?;
+
+        rows_affected
+    }
+
+    pub async fn update_player(id: i32, player: PartialPlayer) -> Result<usize, ApiError> {
+        let rows_affected = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+    
+            let rows_affected = diesel::update(players::table)
+                .filter(players::id.eq(id))
+                .set(player)
+                .execute(conn)?;
+            Ok(rows_affected)
+        }).await?;
+
+        rows_affected
     }
 }
 
@@ -53,9 +83,9 @@ impl Display for Player {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Insertable)]
+#[derive(Deserialize, Serialize, Debug, Insertable, AsChangeset)]
 #[diesel(table_name = crate::schema::players)]
 #[diesel(check_for_backend(diesel::mysql::Mysql))]
-pub struct NewPlayer {
+pub struct PartialPlayer {
     pub name: String
 }

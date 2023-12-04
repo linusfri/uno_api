@@ -16,9 +16,9 @@ pub struct Game {
     pub timestamp: Option<NaiveDateTime>
 }
 
-#[derive(Deserialize, Serialize, Debug, Insertable)]
+#[derive(Deserialize, Serialize, Debug, Insertable, AsChangeset)]
 #[diesel(table_name = crate::schema::games)]
-pub struct NewGame {
+pub struct PartialGame {
     pub winner: i32
 }
 
@@ -36,6 +36,49 @@ impl Game {
         
         Ok(game)
     }
+    
+    pub async fn create_game(new_game: PartialGame) -> Result<String, ApiError> {
+        let rows_affected = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+
+            let res = diesel::insert_into(games::table)
+                .values(new_game).execute(conn);
+
+            res
+        }).await??;
+        
+
+        Ok(format!("Game created, number of rows affected: {}", rows_affected))
+    }
+
+    pub async fn delete_game(id: i32) -> Result<usize, ApiError> {
+        let rows_affected = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+    
+            let rows_affected = diesel::delete(
+                games::table
+                    .filter(games::id.eq(id))
+            ).execute(conn)?;
+
+            Ok(rows_affected)
+        }).await?;
+
+        rows_affected
+    }
+
+    pub async fn update_game(id: i32, game: PartialGame) -> Result<usize, ApiError> {
+        let rows_affected = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+    
+            let rows_affected = diesel::update(games::table)
+                .filter(games::id.eq(id))
+                .set(game)
+                .execute(conn)?;
+            Ok(rows_affected)
+        }).await?;
+
+        rows_affected
+    }
 
     pub async fn get_all_games() -> Result<Vec<Game>, ApiError> {
         let games = web::block(move || {
@@ -51,17 +94,4 @@ impl Game {
         Ok(games)
     }
     
-    pub async fn create_game(new_game: NewGame) -> Result<String, ApiError> {
-        let rows_affected = web::block(move || {
-            let conn = &mut database::connection().expect("Could not get db-connection");
-
-            let res = diesel::insert_into(games::table)
-                .values(new_game).execute(conn);
-
-            res
-        }).await??;
-        
-
-        Ok(format!("Game created, number of rows affected: {}", rows_affected))
-    }
 }
