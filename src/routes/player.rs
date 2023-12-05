@@ -8,6 +8,12 @@ pub async fn get_player(path: web::Path<i32>) -> Result<HttpResponse, ApiError> 
     Ok(HttpResponse::Ok().json(player))
 }
 
+pub async fn get_players() -> Result<HttpResponse, ApiError> {
+    let players = Player::get_all_players().await?;
+
+    Ok(HttpResponse::Ok().json(players))
+}
+
 pub async fn create_player(player: web::Json<PartialPlayer>) -> Result<HttpResponse, ApiError> {
     let player = player.into_inner();
 
@@ -34,6 +40,7 @@ pub fn player_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("")
             .route(web::post().to(create_player))
+            .route(web::get().to(get_players))
             .route(web::head().to(HttpResponse::MethodNotAllowed))
     );
 

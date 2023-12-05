@@ -66,6 +66,20 @@ impl Player {
 
         rows_affected
     }
+
+    pub async fn get_all_players() -> Result<Vec<Player>, ApiError> {
+        let players = web::block(move || {
+            let conn = &mut database::connection().expect("Could not get db-connection");
+
+            let players = players::table
+                .load(conn);
+
+            players
+        }).await?.unwrap();
+        
+
+        Ok(players)
+    }
 }
 
 impl Display for Player {
