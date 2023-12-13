@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse, Result};
-
+use chrono::*;
 use crate::models::{player::{Player, PartialPlayer}, api_error::ApiError};
 
 pub async fn get_player(path: web::Path<i32>) -> Result<HttpResponse, ApiError> {
@@ -12,6 +12,12 @@ pub async fn get_players() -> Result<HttpResponse, ApiError> {
     let players = Player::get_all_players().await?;
 
     Ok(HttpResponse::Ok().json(players))
+}
+
+pub async fn get_player_points(id: web::Path<i32>) -> Result<HttpResponse, ApiError> {
+    let points_for_player = Player::get_player_points(id.into_inner()).await?;
+
+    Ok(HttpResponse::Ok().json(points_for_player))
 }
 
 pub async fn create_player(player: web::Json<PartialPlayer>) -> Result<HttpResponse, ApiError> {
@@ -49,6 +55,12 @@ pub fn player_config(cfg: &mut web::ServiceConfig) {
             .route(web::get().to(get_player))
             .route(web::delete().to(delete_player))
             .route(web::put().to(update_player))
+            .route(web::head().to(HttpResponse::MethodNotAllowed))
+    );
+
+    cfg.service(
+        web::resource("/{id}/points")
+            .route(web::get().to(get_player_points))
             .route(web::head().to(HttpResponse::MethodNotAllowed))
     );
 }
