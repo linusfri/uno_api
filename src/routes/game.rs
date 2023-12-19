@@ -22,13 +22,6 @@ pub async fn delete_game(id: web::Path<i32>) -> Result<HttpResponse, ApiError> {
     Ok(HttpResponse::Ok().json(format!("game with id: {} deleted. Number of rows affected: {}", id, affected_rows)))
 }
 
-pub async fn delete_game_by_winner(id: web::Path<i32>) -> Result<HttpResponse, ApiError> {
-    let id = id.into_inner();
-
-    let affected_rows = Game::delete_game_by_winner(id).await?;
-    Ok(HttpResponse::Ok().json(format!("game with id: {} deleted. Number of rows affected: {}", id, affected_rows)))
-}
-
 pub async fn update_game(id: web::Path<i32>, game: web::Json<PartialGame>) -> Result<HttpResponse, ApiError> {
     let id = id.into_inner();
     let game = game.into_inner();
