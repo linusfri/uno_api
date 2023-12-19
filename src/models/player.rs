@@ -103,7 +103,7 @@ impl Player {
         // let players = web::block(move || {
         //     let conn = &mut database::connection().expect("Could not get db-connection");
 
-        //     let join = players::table.inner_join(games::table.on(winner.eq(players::id)));
+        // let join = players::table.inner_join(games::table.on(winner.eq(players::id)));
 
         //     let players = join
         //         .select((players::all_columns, count(games::id)))

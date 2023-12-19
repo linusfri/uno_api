@@ -5,7 +5,7 @@ use chrono::NaiveDateTime;
 
 use crate::models::api_error::ApiError;
 use crate::models::database;
-use crate::schema::games;
+use crate::schema::games::{self, timestamp};
 
 #[derive(Deserialize, Serialize, Debug, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::games)]
@@ -85,6 +85,7 @@ impl Game {
             let conn = &mut database::connection().expect("Could not get db-connection");
 
             let games = games::table
+                .order_by(timestamp.desc())
                 .load(conn);
 
             games

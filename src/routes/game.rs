@@ -22,6 +22,13 @@ pub async fn delete_game(id: web::Path<i32>) -> Result<HttpResponse, ApiError> {
     Ok(HttpResponse::Ok().json(format!("game with id: {} deleted. Number of rows affected: {}", id, affected_rows)))
 }
 
+pub async fn delete_game_by_winner(id: web::Path<i32>) -> Result<HttpResponse, ApiError> {
+    let id = id.into_inner();
+
+    let affected_rows = Game::delete_game_by_winner(id).await?;
+    Ok(HttpResponse::Ok().json(format!("game with id: {} deleted. Number of rows affected: {}", id, affected_rows)))
+}
+
 pub async fn update_game(id: web::Path<i32>, game: web::Json<PartialGame>) -> Result<HttpResponse, ApiError> {
     let id = id.into_inner();
     let game = game.into_inner();
@@ -41,7 +48,6 @@ pub fn game_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("")
             .route(web::post().to(create_game))
-            .route(web::delete().to(delete_game))
             .route(web::head().to(HttpResponse::MethodNotAllowed))
     );
 
@@ -55,6 +61,7 @@ pub fn game_config(cfg: &mut web::ServiceConfig) {
         web::resource("/{id}")
             .route(web::get().to(get_game))
             .route(web::put().to(update_game))
+            .route(web::delete().to(delete_game))
             .route(web::head().to(HttpResponse::MethodNotAllowed))
     );
 
