@@ -5,7 +5,10 @@ use chrono::NaiveDateTime;
 
 use crate::models::api_error::ApiError;
 use crate::models::database;
-use crate::schema::games::{self, timestamp};
+use crate::schema::games::{self};
+use crate::schema::players::{self};
+
+use super::player::{Player};
 
 #[derive(Deserialize, Serialize, Debug, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::games)]
@@ -14,6 +17,12 @@ pub struct Game {
     pub id: i32,
     pub winner: i32,
     pub timestamp: Option<NaiveDateTime>
+}
+
+#[derive(Deserialize, Serialize, Queryable)]
+pub struct GameWithPlayer {
+    pub game: Game,
+    pub player: Player
 }
 
 #[derive(Deserialize, Serialize, Debug, Insertable, AsChangeset)]
@@ -80,18 +89,17 @@ impl Game {
         rows_affected
     }
 
-    pub async fn get_all_games() -> Result<Vec<Game>, ApiError> {
+    pub async fn get_all_games() -> Result<Vec<GameWithPlayer>, ApiError> {
         let games = web::block(move || {
             let conn = &mut database::connection().expect("Could not get db-connection");
 
             let games = games::table
-                .order_by(timestamp.desc())
-                .load(conn);
+                .inner_join(players::table)
+                .load::<GameWithPlayer>(conn);
 
             games
         }).await?.unwrap();
         
-
         Ok(games)
     }
     

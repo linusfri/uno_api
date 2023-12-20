@@ -46,6 +46,11 @@ pub fn player_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("")
             .route(web::post().to(create_player))
+            .route(web::head().to(HttpResponse::MethodNotAllowed))
+    );
+
+    cfg.service(
+        web::resource("/all")
             .route(web::get().to(get_players))
             .route(web::head().to(HttpResponse::MethodNotAllowed))
     );
