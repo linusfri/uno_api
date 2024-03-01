@@ -1,0 +1,22 @@
+FROM rust as builder
+
+ARG USER_ID
+ARG GROUP_ID
+
+WORKDIR /app
+COPY ../ .
+
+RUN apt update && apt install -y libpq-dev libsqlite3-dev libmariadb-dev
+
+RUN chown -R www-data:www-data /app \
+    && mkdir /target \
+    && chown -R www-data:www-data /target
+
+USER www-data
+
+RUN cargo install diesel_cli --features mysql && \
+    cargo build --release
+
+EXPOSE 8080
+
+CMD ["./target/release/uno_api"]

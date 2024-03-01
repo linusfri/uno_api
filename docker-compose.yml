@@ -1,14 +1,12 @@
 services:
   app:
     build:
-      dockerfile: ./app-build/Dockerfile-app
+      dockerfile: ./docker/Dockerfile-app
       args:
         USER_ID: 1000
         GROUP_ID: 1000
     environment:
       - CARGO_TARGET_DIR=/target
-    ports:
-      - 8080:8080
     volumes:
       - .:/app
 
@@ -29,6 +27,14 @@ services:
       restart: always
       ports:
         - 9000:8080
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - 8080:80
+
 
 volumes:
   db_data:
