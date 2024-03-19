@@ -97,8 +97,17 @@ impl Game {
                 .inner_join(players::table)
                 .load::<GameWithPlayer>(conn);
 
-            games
-        }).await?.unwrap();
+            let sorted_games = match games {
+                Ok(mut games) => {
+                    games.sort_by(|a, b| a.game.id.cmp(&b.game.id));
+
+                    games
+                },
+                Err(_) => vec![]
+            };
+
+            sorted_games
+        }).await?;
         
         Ok(games)
     }
