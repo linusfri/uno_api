@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse, Result};
-use chrono::*;
 use crate::models::{player::{Player, PartialPlayer}, api_error::ApiError};
 
 pub async fn get_player(path: web::Path<i32>) -> Result<HttpResponse, ApiError> {

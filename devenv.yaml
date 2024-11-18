@@ -1,0 +1,10 @@
+inputs:
+  nixpkgs:
+    url: github:NixOS/nixpkgs/nixpkgs-unstable
+  templates:
+    url: github:linusfri/templates
+    flake: false
+allowUnfree: true
+
+imports:
+  - templates
