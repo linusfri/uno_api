@@ -19,7 +19,7 @@
               libmysqlclient
             ];
             postInstall = ''
-              cp -r ./migrations $out/migrations
+              cp -r ./migrations $out/bin/migrations
             '';
             cargoLock.lockFile = ./Cargo.lock;
             src = pkgs.lib.cleanSource ./.;
