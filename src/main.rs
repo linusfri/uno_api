@@ -1,9 +1,11 @@
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
-use diesel_migrations::{FileBasedMigrations, MigrationHarness};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use dotenv::dotenv;
 use uno_api::models::{database, state};
 use uno_api::routes::{game, player};
+
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -13,9 +15,8 @@ async fn main() -> std::io::Result<()> {
         name: "App".to_string(),
     };
     let db_conn = &mut database::connection().expect("Could not get db-connection");
-    db_conn
-        .run_pending_migrations(FileBasedMigrations::from_path("./migrations").unwrap())
-        .expect("Error processing migrations");
+    
+    db_conn.run_pending_migrations(MIGRATIONS).expect("Failed to run migratations");
 
     HttpServer::new(move || {
         let cors = Cors::permissive();

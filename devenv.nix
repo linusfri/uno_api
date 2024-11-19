@@ -23,7 +23,6 @@ in
 
     languages.rust.enable = true;
 
-    # processes.cargo-watch.exec = "cargo watch -x run";
-    processes.app.exec = "./result/bin/uno_api";
+    processes.cargo-watch.exec = "cargo watch -x run";
   };
 }
